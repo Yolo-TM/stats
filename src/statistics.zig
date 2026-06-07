@@ -644,8 +644,8 @@ fn getLinesChanged(
                     .{ item.repo.name, status.phrase() },
                 );
                 std.log.err(
-                    "Request failed with response {?s}",
-                    .{status.phrase()},
+                    "Request failed for {s} with response {?s}",
+                    .{ item.repo.name, status.phrase() },
                 );
                 return error.RequestFailed;
             },
