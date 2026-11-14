@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 defaults:
   run:
@@ -24,14 +24,6 @@ jobs:
       run: |
         zig build
 
-    - name: Checkout history branch
-      run: |
-        git config --global user.name "jstrieb/github-stats"
-        git config --global user.email "github-stats[bot]@jstrieb.github.io"
-        # Push generated files to the generated branch
-        git pull
-        git checkout generated || git checkout -b generated
-
     - name: Generate images
       run: |
         ./zig-out/bin/github-stats --json-output-file stats.json
@@ -45,9 +37,17 @@ jobs:
         # https://github.com/orgs/community/discussions/192970
         MAX_RETRIES: 5
 
-    - name: Commit to the repo
+    - name: Publish to private-stats
+      env:
+        GH_TOKEN: ${{ secrets.PRIVATE_STATS_TOKEN }}
       run: |
-        git add .
-        # Force the build to succeed, even if no files were changed
-        git commit -m 'Update generated files' || true
-        git push --set-upstream origin generated
+        gh auth setup-git
+        gh repo clone Yolo-TM/private-stats private-stats -- --depth=1
+        cp stats.json overview.svg languages.svg private-stats/
+
+        cd private-stats
+        git config user.name "jstrieb/github-stats"
+        git config user.email "github-stats[bot]@jstrieb.github.io"
+        git add stats.json overview.svg languages.svg
+        git diff --cached --quiet || git commit -m 'Update generated files'
+        git push origin main
