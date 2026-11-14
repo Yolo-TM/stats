@@ -43,6 +43,9 @@ jobs:
       run: |
         gh auth setup-git
         gh repo clone Yolo-TM/private-stats private-stats -- --depth=1
+        cd private-stats
+        git checkout -B main
+        cd ..
         cp stats.json overview.svg languages.svg private-stats/
 
         cd private-stats
@@ -50,4 +53,4 @@ jobs:
         git config user.email "github-stats[bot]@jstrieb.github.io"
         git add stats.json overview.svg languages.svg
         git diff --cached --quiet || git commit -m 'Update generated files'
-        git push origin main
+        git push --set-upstream origin main
