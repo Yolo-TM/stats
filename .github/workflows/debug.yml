@@ -1,4 +1,4 @@
-name: Generate Stats Images
+name: Generate Stats Debug Files
 
 on:
   workflow_dispatch:
